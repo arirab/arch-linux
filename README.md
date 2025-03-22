@@ -3,8 +3,9 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/btrfs-blue?style=flat-square&logo=btrfs&logoColor=white" />
   <img src="https://img.shields.io/badge/SecureBoot-UKI-blue?style=flat-square" />
-  <img src="https://img.shields.io/badge/btrfs%20%2B%20Snapshots-brightgreen?style=flat-square" />
+  <img src="https://img.shields.io/badge/Snapshots-brightgreen?style=flat-square" />
   <img src="https://img.shields.io/badge/VaultSync-GPG%20%2B%20rclone-blueviolet?style=flat-square" />
   <img src="https://img.shields.io/github/actions/workflow/status/arirab/arch-linux/ci.yml?branch=main&style=flat-square" />
   <img src="https://img.shields.io/badge/docs-walkthroughs-lightgrey?style=flat-square" />
@@ -44,7 +45,7 @@ graph LR
 
 ---
 
-##  Highlights of the System Architecture
+## Highlights of the System
 
 <p align="center">
   <table>
@@ -134,7 +135,7 @@ graph TD
 nvme0n1
  nvme0n1p1  /efi        (FAT32)
  nvme0n1p2  
-   └─cryptarch (LVM)
+   └─cryptarch
       ├─vg0-root  →  /       (Btrfs @)
       ├─vg0-home  →  /home   (Btrfs @home)
       ├─vg0-var   →  /var    (Btrfs @var)
@@ -157,9 +158,7 @@ graph TD
 
 - 📅 Uses same keyfile for unlocking all encrypted drives  
 - 🔗 Smart bind mounts from `/Data/Music` to `~/Music`, etc.
-- 🏛️ `/Pantheon` 20TB for Private Cloud and Media archive.
-
----
+- 🏛️ `/Pantheon` 20TB for Private Cloud and Media Archive.
 
 ---
 
@@ -225,10 +224,10 @@ sequenceDiagram
 
 ---
 
-### 😂 HUMOR!
+#### 😂 HUMOR!
 
 > **Why did I ran `rm -rf /`?**  
-> _Inner peace comes from letting go._ 🍺
+> _Inner peace comes from letting go._ 🧘‍♂️
 
 > **"Ubuntu walks into a bar."**  
 > _Arch compiles its own bar from source._ 🍺
@@ -250,17 +249,17 @@ sequenceDiagram
 
 ---
 
-### 📚 READ!
+#### 📚 READ!
 
 > 🔗 [Arch Wiki](https://wiki.archlinux.org/)
 
-### 🆘 HELP!
+#### 🆘 HELP!
 
 > 🔗 [RTFM](https://en.wikipedia.org/wiki/RTFM)  
 > 🔗 [Arch Linux Forums](https://bbs.archlinux.org/index.php)  
-> 💙 The Arch community loves you even if you pipe `curl | sh` without reading.
+> 💙 The Arch community loves you even if you pipe `curl | sh` without reading the man pages.
 
-### 🧢 SWAG!
+#### 🧢 SWAG!
 
 > `pacman -Syu` — is love.  
 > `rm -rf /` — is a lesson.  
@@ -276,10 +275,5 @@ sequenceDiagram
   This project is not affiliated with <a href="https://archlinux.org/">Arch Linux</a>.
 </p>
 
-<p align="center">
-  <strong>📜 License</strong><br>
-  This project is licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.<br>
-  See <a href="./LICENSE">LICENSE</a> for full details.
-</p>
-
+---
 ---
