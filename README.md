@@ -245,7 +245,7 @@ sequenceDiagram
 > _Too many updates. Not enough commitment._ 💔
 
 > **"What's an Arch user's idea of a romantic evening?"**  
-> _By candlelight, the kernel recompiled. NVIDIA DKMS whispered in silence, while [“Seeing In The Dark”](https://www.youtube.com/watch?v=-2dADSn8vg8&list=PLxG-KbBWHU82fpu9LNrBMcgebDgZ1p5XL) played in 320kbps FLAC - piped through PulseALSA, MPD, CamillaDSP, and ncmpcpp._ 🕯️🎼🎧
+> _By candlelight, the kernel recompiled. NVIDIA DKMS rebuilt in silence, while [“Seeing In The Dark”](https://www.youtube.com/watch?v=-2dADSn8vg8&list=PLxG-KbBWHU82fpu9LNrBMcgebDgZ1p5XL) played in 320kbps FLAC - pulsed through ALSA, MPD, CamillaDSP, and ncmpcpp._ 🕯️🎵🎧
 
 ---
 
@@ -269,10 +269,9 @@ sequenceDiagram
 
 <p align="center">
   <strong>™️ Notice</strong><br>
-  <em>"Arch Linux"</em> and the Arch logo are trademarks of
+  <em>Arch Logo</em> is the trademarks of
   <a href="https://zeroflux.org/">Judd Vinet</a> and
   <a href="https://www.leventepolyak.net/">Levente Polyák</a>.<br>
-  This project is not affiliated with <a href="https://archlinux.org/">Arch Linux</a>.
 </p>
 
 ---
