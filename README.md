@@ -245,7 +245,7 @@ sequenceDiagram
 > _Too many updates. Not enough commitment._ 💔
 
 > **"What's an Arch user's idea of a romantic evening?"**  
-> _By candlelight, the kernel recompiled. NVIDIA DKMS rebuilt in silence, while [“Seeing In The Dark”](https://www.youtube.com/watch?v=-2dADSn8vg8&list=PLxG-KbBWHU82fpu9LNrBMcgebDgZ1p5XL) played in 320kbps FLAC - pulsed through ALSA, MPD, CamillaDSP, and ncmpcpp._ 🕯️🎵🎧
+> _By candlelight, the kernel recompiled. DKMS drivers for nVidia rebuilb in silence, while [“Seeing In The Dark”](https://www.youtube.com/watch?v=-2dADSn8vg8&list=PLxG-KbBWHU82fpu9LNrBMcgebDgZ1p5XL) played in 320kbps FLAC - pulsed through ALSA, MPD, CamillaDSP, and ncmpcpp._ 🕯️🎵🎧
 
 ---
 
