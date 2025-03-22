@@ -162,7 +162,7 @@ graph TD
 
 ---
 
-## Encryption + TPM Unlock Flow
+## Encryption & TPM Unlock Flow
 
 ```mermaid
 flowchart LR
