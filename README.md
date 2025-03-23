@@ -31,10 +31,10 @@
 ## Principle: 🔗 <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a>
 ```mermaid
 graph LR
-  A[Minimalism] --> B[Security-First]
+  A[Security_First] --> B[Minimalism]
   B --> C[Automation]
-  C --> D[Recovery-Aware]
-  D --> E[Future-Proofing]
+  C --> D[Recovery_Aware]
+  D --> E[Future_Proofing]
 ```
 
 ---
