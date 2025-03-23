@@ -64,7 +64,7 @@ graph LR
       <tr>
         <td> Secure Boot + UKI</td>
         <td>GRUB with signed kernel support</td>
-        <td>Ensures boot integrity, defends against tampering and Evil Maid attacks</td>
+        <td>Ensures boot integrity, defends against tampering and `Evil Maid` attacks</td>
       </tr>
       <tr>
         <td> LVM + Btrfs Layout</td>
