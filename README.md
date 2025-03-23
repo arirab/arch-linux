@@ -101,7 +101,7 @@ graph LR
 
 | Feature                                  | Status | Description |
 |------------------------------------------|--------|-------------|
-| 📊 Loki + Grafana                        | ⏳     | Real-time log aggregation, dashboarding, and streaming analytics for `v01dsh3ll`’s heartbeat |
+| 📊 Loki & Grafana                        | ⏳     | Real-time log aggregation, dashboarding, and streaming analytics for `v01dsh3ll`’s heartbeat |
 | 🤖 Discord Bots                          | ⏳     | Security alerts from AppArmor, wireguard, Media & backup status, remote triggers |
 | ☁️ Private Cloud                         | ⏳     | Nextcloud or Immich backed by `/Pantheon` with Btrfs snapshots and secure remote access |
 | 💃 Streaming Service                     | ⏳     | Jellyfin + Emby + Navidrome + Dolby HDR + HW Transcoding + FLAC streaming + Tailscale |
