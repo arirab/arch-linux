@@ -265,7 +265,7 @@ sequenceDiagram
   <strong>™️ Notice</strong><br>
   <em>Arch Logo</em> is the trademarks of
   <a href="https://zeroflux.org/">Judd Vinet</a> and
-  <a href="https://www.leventepolyak.net/">Levente Polyák</a>.<br>
+  <a href="https://www.leventepolyak.net/">Levente Polyák</a><br>
 </p>
 
 ---
