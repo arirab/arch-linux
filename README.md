@@ -221,22 +221,22 @@ sequenceDiagram
 #### 😂 HUMOR!
 
 > **Why did I ran `rm -rf /`?**  
-> _Inner peace comes from letting go._ 🧘‍♂️
+> _Inner peace comes from letting go._
 
 > **"Ubuntu walks into a bar."**  
-> _Arch compiles its own bar from source._ 🍺
+> _Arch compiles its own bar from source._
 
 > **"Who needs therapy when you can `makepkg`?"**  
-> _Self-healing via compiling._ 💻
+> _Self-healing via compiling._
 
 > **"Why did the Archer cross the road?"**  
-> _To compile the kernel on the other side._ ⚙️
+> _To compile the kernel on the other side._ 
 
 > **"How many Archer does it take to screw in a lightbulb?"**  
-> _None. They rebuild the house and document it in Markdown._ 🛠️
+> _None. They rebuild the house and document it in Markdown._ 
 
 > **"Why did the Fedora get dumped by his Arch girlfriend?"**  
-> _Too many updates. Not enough commitment._ 💔
+> _Too many updates. Not enough commitment._ 
 
 > **"What's an Archer's idea of a romantic evening?"**  
 > _By candlelight, the kernel recompiled. DKMS drivers for nVidia rebuilb in silence, while [“Seeing In The Dark”](https://www.youtube.com/watch?v=-2dADSn8vg8&list=PLxG-KbBWHU82fpu9LNrBMcgebDgZ1p5XL) played in 320kbps FLAC - pulsed through ALSA, MPD, CamillaDSP, and ncmpcpp._ 🕯️🎵🎧
