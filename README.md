@@ -24,7 +24,7 @@
 
 ---
 
-<p align="center">`v01dsh3ll` the Mustang Darkhorse in the Linux multiverse — this LinuxBox breathes elegance and bleeds entropy. Crafted for dreamers, tuned by hackers, and worshipped by psychonauts.</p>
+<p align="center">`v01dsh3ll` the Mustang Darkhorse in the Linux multiverse — this LinuxBox breathes elegance and bleeds entropy.</p>
 
 ---
 
