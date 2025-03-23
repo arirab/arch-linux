@@ -22,19 +22,13 @@
   <img src="https://raw.githubusercontent.com/arirab/arch-install/main/.assets/terminal-boot-demo.gif" alt="Arch Boot Demo" width="700"/>
 </p>
 
-<blockquote>
-  <p align="center"><strong><em>"A system is only as efficient as the intent behind its command line."</em></strong></p>
-  <p align="center">— Psychonauts</p>
-</blockquote>
+---
+
+<p align="center">`v01dsh3ll` the Mustang Darkhorse in the Linux multiverse — this LinuxBox breathes elegance and bleeds entropy. Crafted for dreamers, tuned by hackers, and worshipped by psychonauts.</p>
 
 ---
 
-<p align="center">`v01dsh3ll` the Mustang Darkhorse in the Linux multiverse — this Arch LinuxBox breathes elegance and bleeds entropy. Crafted for dreamers, tuned by hackers, and worshipped by psychonauts.</p>
-
----
----
-
-## Philosophy: 🔗 <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a>
+## Principle: 🔗 <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a>
 ```mermaid
 graph LR
   A[Minimalism] --> B[Security-First]
@@ -235,16 +229,16 @@ sequenceDiagram
 > **"Who needs therapy when you can `makepkg`?"**  
 > _Self-healing via compiling._ 💻
 
-> **"Why did the Arch user cross the road?"**  
+> **"Why did the Archer cross the road?"**  
 > _To compile the kernel on the other side._ ⚙️
 
-> **"How many Arch users does it take to screw in a lightbulb?"**  
+> **"How many Archer does it take to screw in a lightbulb?"**  
 > _None. They rebuild the house and document it in Markdown._ 🛠️
 
-> **"Why did the Fedora user get dumped by his Arch girlfriend?"**  
+> **"Why did the Fedora get dumped by his Arch girlfriend?"**  
 > _Too many updates. Not enough commitment._ 💔
 
-> **"What's an Arch user's idea of a romantic evening?"**  
+> **"What's an Archer's idea of a romantic evening?"**  
 > _By candlelight, the kernel recompiled. DKMS drivers for nVidia rebuilb in silence, while [“Seeing In The Dark”](https://www.youtube.com/watch?v=-2dADSn8vg8&list=PLxG-KbBWHU82fpu9LNrBMcgebDgZ1p5XL) played in 320kbps FLAC - pulsed through ALSA, MPD, CamillaDSP, and ncmpcpp._ 🕯️🎵🎧
 
 ---
