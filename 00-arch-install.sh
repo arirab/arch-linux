@@ -1,11 +1,41 @@
 #!/bin/bash
 
 set -e
-LOG_FILE="/root/arch-install.log"
-trap 'echo -e "\n[!] Install failed. See $LOG_FILE for details."; exit 1' ERR
+trap 'echo "[!] Install failed. See /root/arch-install-error.log for details."; exit 1' ERR
 
-# Redirect all output to log
-exec > >(tee -a "$LOG_FILE") 2>&1
+# Log all output
+exec > >(tee -a /root/arch-install.log) 2>&1
+
+# ================================================
+# Cleanup Mode for Previous Install Traces
+# ================================================
+if [[ "$1" == "--cleanup" ]]; then
+  echo -e "\n[!] Running cleanup routine..."
+
+  echo "[*] Unmounting /mnt if mounted..."
+  umount -R /mnt 2>/dev/null || echo "Nothing to unmount"
+
+  echo "[*] Deactivating swap..."
+  swapoff -a || true
+
+  echo "[*] Closing any mapped LUKS devices..."
+  cryptsetup close cryptarch 2>/dev/null || echo "No LUKS device open"
+
+  echo "[*] Disabling LVM volume group..."
+  vgchange -an vg0 2>/dev/null || echo "No active VG found"
+
+  echo -e "\n[!] WARNING: Do you want to wipe filesystem signatures from $DISK? This will destroy any data!"
+  read -rp "Type 'YES' to confirm: " confirm
+  if [[ "$confirm" == "YES" ]]; then
+    echo "[*] Wiping filesystem signatures from $DISK..."
+    wipefs -a "$DISK"
+  else
+    echo "Skipping disk wipe."
+  fi
+
+  echo -e "\n Cleanup complete. You can now re-run the installer."
+  exit 0
+fi
 
 
 # ===============================================================
@@ -89,6 +119,8 @@ mkfs.btrfs -f "/dev/$VG_NAME/var"
 
 # === Mount Volumes ===
 mount "/dev/$VG_NAME/root" /mnt
+[[ -d /mnt ]] || { echo " Failed to mount /mnt"; exit 1; }
+
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var
@@ -97,6 +129,8 @@ umount /mnt
 
 mount -o compress=zstd,subvol=@ /dev/$VG_NAME/root /mnt
 mkdir -p /mnt/{home,var,tmp,efi}
+[[ -d /mnt/home ]] || { echo " /mnt/home not created!"; exit 1; }
+
 mount -o compress=zstd,subvol=@home /dev/$VG_NAME/home /mnt/home
 mount -o compress=zstd,subvol=@var /dev/$VG_NAME/var /mnt/var
 mount -o compress=zstd,subvol=@tmp /dev/$VG_NAME/tmp /mnt/tmp
