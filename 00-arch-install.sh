@@ -62,8 +62,9 @@ mkfs.fat -F32 $EFI_PART
 
 # === Encrypt and Open LUKS Partition ===
 echo -e "\n Encrypting root partition..."
-echo -n "$luks_passphrase" | cryptsetup luksFormat --type $LUKS_TYPE --pbkdf pbkdf2 --force $LUKS_PART -d -
-echo -n "$luks_passphrase" | cryptsetup open $LUKS_PART $CRYPT_NAME -d -
+echo -n "$luks_passphrase" | cryptsetup luksFormat --type $LUKS_TYPE --pbkdf pbkdf2 --key-file=- $LUKS_PART
+echo -n "$luks_passphrase" | cryptsetup open --key-file=- $LUKS_PART $CRYPT_NAME
+
 
 # === Create LVM Volumes ===
 pvcreate /dev/mapper/$CRYPT_NAME
