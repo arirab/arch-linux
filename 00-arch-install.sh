@@ -9,13 +9,16 @@ trap 'echo "Install failed. Check above logs for errors."; exit 1' ERR
 # ===============================================================
 
 # === USER CONFIG PROMPTS ===
+
 echo -e "\n Welcome to Arch Installer"
 read -rp "  Enter hostname: " HOSTNAME
 read -rp " Enter target disk (e.g., /dev/nvme0n1): " DISK
+DISK=${DISK:-/dev/nvme0n1}
 read -rp " Enter keyfile path [/root/secrets/crypto_keyfile.bin]: " KEYFILE
 KEYFILE=${KEYFILE:-/root/secrets/crypto_keyfile.bin}
-read -rp " Enter timezone (e.g. America/Denver): " TIMEZONE
-read -rp " Enter keyboard layout [default: us]: " KEYMAP
+read -rp " Enter timezone [America/Denver]: " TIMEZONE
+TIMEZONE=${TIMEZONE:-America/Denver}
+read -rp " Enter keyboard layout [us]: " KEYMAP
 KEYMAP=${KEYMAP:-us}
 
 CRYPT_NAME="cryptarch"
@@ -24,18 +27,18 @@ EFI_SIZE="1024MiB"
 LUKS_TYPE="luks2"
 
 # === WiFi Connection ===
-echo -e "\n Connecting to WiFi..."
-iwctl station list
-read -rp "Enter WiFi Interface (e.g. wlan0): " WIFI_IFACE
-read -rp "Enter SSID: " SSID
-read -rsp "Enter WiFi Password: " WIFI_PASS
-echo
-iwctl --passphrase "$WIFI_PASS" station "$WIFI_IFACE" connect "$SSID"
-echo -e " Connected to $SSID"
+#echo -e "\n Connecting to WiFi..."
+#iwctl station list
+#read -rp "Enter WiFi Interface (e.g. wlan0): " WIFI_IFACE
+#read -rp "Enter SSID: " SSID
+#read -rsp "Enter WiFi Password: " WIFI_PASS
+#echo
+#iwctl --passphrase "$WIFI_PASS" station "$WIFI_IFACE" connect "$SSID"
+#echo -e " Connected to $SSID"
 
 # === Internet Test ===
-echo -e "\n Checking internet connectivity..."
-ping -q -c 3 archlinux.org && echo " Ping OK" || { echo " Internet check failed"; exit 1; }
+#echo -e "\n Checking internet connectivity..."
+#ping -q -c 3 archlinux.org && echo " Ping OK" || { echo " Internet check failed"; exit 1; }
 
 # === Prompt for Disk Encryption Passphrase ===
 echo -e "\n Enter LUKS disk encryption passphrase:"
