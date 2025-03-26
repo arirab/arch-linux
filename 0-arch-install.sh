@@ -9,15 +9,18 @@ trap 'echo "Install failed. Check previous errors."; exit 1' ERR
 # Secure Boot & UKI Ready + Swap Compression + TPM prep hooks
 # ===================================================================
 
-# --- CONFIG ---
-DISK="/dev/nvme0n1"
-HOSTNAME="v01dsh3ll"
-USERNAME="rock"
+# --- USER INPUT ---
+echo -e "\n Starting Arch Installer..."
+read -rp "Enter desired hostname: " HOSTNAME
+read -rp "Enter desired username: " USERNAME
+read -rp "Enter target disk (e.g., /dev/nvme0n1): " DISK
+read -rp "Enter keyfile path [/root/secrets/crypto_keyfile.bin]: " KEYFILE
+KEYFILE=${KEYFILE:-/root/secrets/crypto_keyfile.bin}
+
 CRYPT_NAME="cryptarch"
-VG_NAME="vg0"
+VG_NAME="vg-arch"
 EFI_SIZE="1024MiB"
 LUKS_TYPE="luks2"
-KEYFILE="/root/secrets/crypto_keyfile.bin"
 
 # --- Connect to WiFi ---
 echo -e "\n Connecting to WiFi..."
@@ -113,16 +116,16 @@ echo -e "\n Generating fstab..."
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # --- Chroot Preparation ---
-echo -e "\n Copying keyfile, preparing for chroot..."
+echo -e "\n Preparing system in chroot..."
 arch-chroot /mnt /bin/bash <<EOF
 
-mkdir -p /root/secrets
+mkdir -p $(dirname $KEYFILE)
 dd if=/dev/urandom of=$KEYFILE bs=1 count=64
 chmod 600 $KEYFILE
 cryptsetup luksAddKey $LUKS_PART $KEYFILE
 
 # --- Setup crypttab ---
-echo "$CRYPT_NAME UUID=\$(blkid -s UUID -o value $LUKS_PART) $KEYFILE luks" >> /etc/crypttab
+echo "$CRYPT_NAME UUID=\\$(blkid -s UUID -o value $LUKS_PART) $KEYFILE luks" >> /etc/crypttab
 
 # --- Setup mkinitcpio ---
 sed -i 's/^HOOKS=.*/HOOKS=(base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
@@ -130,23 +133,19 @@ echo "FILES=($KEYFILE)" >> /etc/mkinitcpio.conf
 mkinitcpio -P
 
 # --- Setup GRUB ---
-sed -i 's/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=\$(blkid -s UUID -o value $LUKS_PART):$CRYPT_NAME root=\/dev\/$VG_NAME\/root cryptkey=rootfs:$KEYFILE\"/' /etc/default/grub
+sed -i "s/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=\\$(blkid -s UUID -o value $LUKS_PART):$CRYPT_NAME root=\/dev\/$VG_NAME\/root cryptkey=rootfs:$KEYFILE\"/" /etc/default/grub
 echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 echo "GRUB_DEFAULT=saved" >> /etc/default/grub
 echo "GRUB_SAVEDEFAULT=true" >> /etc/default/grub
 
-# --- Install CPU microcode (Intel Chipsets intel-ucode) ---
 pacman -S --noconfirm amd-ucode
 
-# --- GRUB Installation ---
 grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
-# Set --- linux-lts as default ---
 LTS_ENTRY=\$(grep -E "menuentry 'Arch Linux, with Linux linux-lts'" /boot/grub/grub.cfg | head -n1 | cut -d'\'' -f2)
 grub-set-default "Advanced options for Arch Linux>\$LTS_ENTRY"
 
-# --- Set timezone, locale, hostname ---
 ln -sf /usr/share/zoneinfo/America/Denver /etc/localtime
 hwclock --systohc
 
@@ -156,25 +155,16 @@ locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "$HOSTNAME" > /etc/hostname
 echo -e "127.0.0.1 localhost\n::1 localhost\n127.0.1.1 $HOSTNAME.localdomain $HOSTNAME" > /etc/hosts
-
-# --- Set keymap ---
 echo "KEYMAP=us" > /etc/vconsole.conf
 
-# --- Enable WiFi after reboot ---
 systemctl enable NetworkManager
-
-# Auto-connect to known SSID after reboot
-nmcli dev wifi connect "<SSID>" password "<WIFI_PASS>"
-
-# --- Set root password ---
 passwd
 
-# --- Save UUID info ---
 blkid > /root/arch-install-summary.txt
 EOF
 
 # --- Cleanup ---
-echo -e "\n Unmounting and cleaning up..."
+echo -e "\n🧹 Unmounting and cleaning up..."
 umount -R /mnt
 swapoff "/dev/$VG_NAME/swap"
 echo -e "\n Base install complete. You can now reboot into your system."
