@@ -1,7 +1,12 @@
 #!/bin/bash
 
 set -e
-trap 'echo "Install failed. Check above logs for errors."; exit 1' ERR
+LOG_FILE="/root/arch-install.log"
+trap 'echo -e "\n[!] Install failed. See $LOG_FILE for details."; exit 1' ERR
+
+# Redirect all output to log
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 
 # ===============================================================
 #  Arch Linux Installer — Full-disk LUKS2 + LVM + Btrfs + GRUB
@@ -162,6 +167,15 @@ EOF
 echo -e "\n Unmounting filesystems..."
 umount -R /mnt
 swapoff "/dev/$VG_NAME/swap"
+
+
+echo -e "\n[+] Installation script finished (success or fail)."
+echo "[+] Logs saved at: $LOG_FILE"
+
+# Archive logs for easy upload or git push
+echo "[+] Creating log archive: /root/arch-install-debug.tar.gz"
+tar czf /root/arch-install-debug.tar.gz "$LOG_FILE" /root/arch-install-summary.txt /var/log/* || true
+
 
 # === Done ===
 echo -e "\n Arch base install complete!"
