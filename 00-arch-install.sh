@@ -8,30 +8,6 @@ LOG_FILE="/root/arch-install.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 # ================================
-# Cleanup Option for Reruns
-# ================================
-if [[ "$1" == "--cleanup" ]]; then
-  echo "[!] Cleanup mode enabled"
-  echo "[*] Unmounting /mnt..."
-  umount -R /mnt 2>/dev/null || true
-  swapoff -a || true
-
-  echo "[*] Closing LUKS and deactivating LVM..."
-  cryptsetup close cryptarch 2>/dev/null || true
-  vgchange -an vg0 2>/dev/null || true
-
-  read -rp "Do you want to wipe all signatures on disk? This DESTROYS ALL DATA. Type 'YES': " confirm
-  if [[ "$confirm" == "YES" ]]; then
-    read -rp "Enter disk to wipe (e.g. /dev/nvme0n1): " WIPE_DISK
-    wipefs -a "$WIPE_DISK"
-    echo "Disk wiped."
-  fi
-
-  echo "Cleanup complete."
-  exit 0
-fi
-
-# ================================
 # User Prompts
 # ================================
 echo -e "\n Welcome to Arch Installer"
@@ -93,22 +69,32 @@ mkfs.btrfs -f "/dev/$VG_NAME/var"
 # ================================
 # Mount Filesystems
 # ================================
+
+# Mount root to /mnt temporarily to create subvolumes
 mount "/dev/$VG_NAME/root" /mnt
+
+# Create Btrfs subvolumes
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var
 btrfs subvolume create /mnt/@tmp
 umount /mnt
 
+# Mount subvolumes properly
 mount -o compress=zstd,subvol=@ /dev/$VG_NAME/root /mnt
-mkdir -p /mnt/{home,var,tmp,efi}
-[[ -d /mnt/home ]] || { echo " /mnt/home not created!"; exit 1; }
 
+# NOW ensure the directories exist
+mkdir -p /mnt/home /mnt/var /mnt/tmp /mnt/efi
+
+# Final mounts
 mount -o compress=zstd,subvol=@home /dev/$VG_NAME/home /mnt/home
 mount -o compress=zstd,subvol=@var /dev/$VG_NAME/var /mnt/var
 mount -o compress=zstd,subvol=@tmp /dev/$VG_NAME/tmp /mnt/tmp
 mount "$EFI_PART" /mnt/efi
+
+# Enable swap
 swapon "/dev/$VG_NAME/swap"
+
 
 # ================================
 # Base Install
