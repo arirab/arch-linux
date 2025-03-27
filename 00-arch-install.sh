@@ -12,6 +12,7 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 # ================================
 echo -e "\n Welcome to Arch Installer"
 read -rp " Enter hostname: " HOSTNAME
+HOSTNAME=${HOSTNAME:-v01dsh3ll}
 read -rp " Enter target disk [/dev/nvme0n1]: " DISK
 DISK=${DISK:-/dev/nvme0n1}
 read -rp " Enter keyfile path [/root/secrets/crypto_keyfile.bin]: " KEYFILE
@@ -30,7 +31,6 @@ LUKS_TYPE="luks2"
 # Disk Partitioning
 # ================================
 echo -e "\n[+] Partitioning $DISK..."
-wipefs -a "$DISK"
 parted "$DISK" --script mklabel gpt \
   mkpart ESP fat32 1MiB "$EFI_SIZE" \
   set 1 esp on \
@@ -45,8 +45,8 @@ LUKS_PART="${DISK}p2"
 mkfs.fat -F32 "$EFI_PART"
 
 echo -e "\n[+] Encrypting LUKS root..."
-echo -n "Enter LUKS Passphrase: "
-read -rs luks_passphrase
+read -srp " Enter LUKS Passphrase [default: Encryption-Password]: " luks_passphrase
+luks_passphrase=${luks_passphrase:-Encryption-Password}
 echo
 echo -n "$luks_passphrase" | cryptsetup luksFormat --type "$LUKS_TYPE" --pbkdf pbkdf2 --key-file=- "$LUKS_PART"
 echo -n "$luks_passphrase" | cryptsetup open --key-file=- "$LUKS_PART" "$CRYPT_NAME"
@@ -54,17 +54,11 @@ echo -n "$luks_passphrase" | cryptsetup open --key-file=- "$LUKS_PART" "$CRYPT_N
 pvcreate /dev/mapper/$CRYPT_NAME
 vgcreate $VG_NAME /dev/mapper/$CRYPT_NAME
 lvcreate -L 8G $VG_NAME -n swap
-lvcreate -L 40G $VG_NAME -n root
-lvcreate -L 10G $VG_NAME -n tmp
-lvcreate -L 40G $VG_NAME -n var
-lvcreate -l 100%FREE $VG_NAME -n home
+lvcreate -l 100%FREE $VG_NAME -n root
 
 # Format
 mkswap "/dev/$VG_NAME/swap"
 mkfs.btrfs -f "/dev/$VG_NAME/root"
-mkfs.btrfs -f "/dev/$VG_NAME/home"
-mkfs.btrfs -f "/dev/$VG_NAME/tmp"
-mkfs.btrfs -f "/dev/$VG_NAME/var"
 
 # ================================
 # Mount Filesystems
@@ -83,18 +77,16 @@ umount /mnt
 # Mount subvolumes properly
 mount -o compress=zstd,subvol=@ /dev/$VG_NAME/root /mnt
 
-# NOW ensure the directories exist
-mkdir -p /mnt/home /mnt/var /mnt/tmp /mnt/efi
+# Ensure directories exist
+mkdir -p /mnt/{home,var,tmp,efi}
 
-# Final mounts
-mount -o compress=zstd,subvol=@home /dev/$VG_NAME/home /mnt/home
-mount -o compress=zstd,subvol=@var /dev/$VG_NAME/var /mnt/var
-mount -o compress=zstd,subvol=@tmp /dev/$VG_NAME/tmp /mnt/tmp
+mount -o compress=zstd,subvol=@home /dev/$VG_NAME/root /mnt/home
+mount -o compress=zstd,subvol=@var /dev/$VG_NAME/root /mnt/var
+mount -o compress=zstd,subvol=@tmp /dev/$VG_NAME/root /mnt/tmp
 mount "$EFI_PART" /mnt/efi
 
 # Enable swap
 swapon "/dev/$VG_NAME/swap"
-
 
 # ================================
 # Base Install
