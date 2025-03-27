@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 trap 'echo "[!] Install failed. See /root/arch-install-error.log for details."; exit 1' ERR
 
@@ -124,28 +123,8 @@ echo "$HOSTNAME" > /etc/hostname
 echo -e "127.0.0.1 localhost\n::1 localhost\n127.0.1.1 $HOSTNAME.localdomain $HOSTNAME" > /etc/hosts
 echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
 
-# Snapper setup
-chmod 750 /.snapshots
-chown :wheel /.snapshots
-snapper -c root create-config /
-
-if [[ -f /etc/snapper/configs/root ]]; then
-  sed -i 's/^TIMELINE_CREATE=.*/TIMELINE_CREATE="yes"/' /etc/snapper/configs/root
-  sed -i 's/^TIMELINE_CLEANUP=.*/TIMELINE_CLEANUP="yes"/' /etc/snapper/configs/root
-  sed -i 's/^NUMBER_CLEANUP=.*/NUMBER_CLEANUP="yes"/' /etc/snapper/configs/root
-  sed -i 's/^NUMBER_MIN_AGE=.*/NUMBER_MIN_AGE="1800"/' /etc/snapper/configs/root
-  sed -i 's/^NUMBER_LIMIT=.*/NUMBER_LIMIT="50"/' /etc/snapper/configs/root
-  sed -i 's/^NUMBER_LIMIT_IMPORTANT=.*/NUMBER_LIMIT_IMPORTANT="10"/' /etc/snapper/configs/root
-  sed -i 's/^TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="10"/' /etc/snapper/configs/root
-  sed -i 's/^TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="10"/' /etc/snapper/configs/root
-  sed -i 's/^TIMELINE_LIMIT_WEEKLY=.*/TIMELINE_LIMIT_WEEKLY="0"/' /etc/snapper/configs/root
-  sed -i 's/^TIMELINE_LIMIT_MONTHLY=.*/TIMELINE_LIMIT_MONTHLY="0"/' /etc/snapper/configs/root
-  sed -i 's/^TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
-fi
-
-systemctl enable snapper-timeline.timer || true
-systemctl enable snapper-cleanup.timer || true
-systemctl enable NetworkManager || true
+# NOTE: Snapper configuration is deferred.
+# Please run the post-install script (/root/post_install_snapper.sh) after your first boot.
 
 # Create user (without setting password)
 useradd -m -G wheel,audio,video,storage,network,power -s /bin/zsh "$USERNAME"
@@ -162,3 +141,4 @@ swapoff "/dev/$VG_NAME/swap"
 
 echo -e "\n[\u2713] Installation Complete"
 echo -e " Run 'passwd' and 'passwd $USERNAME' to set root and user passwords."
+echo -e " After your first boot, run /root/01-post_installation.sh to configure snapper."
