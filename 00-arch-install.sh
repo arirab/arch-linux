@@ -132,13 +132,15 @@ echo "$USERNAME ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-$USERNAME
 chmod 440 /etc/sudoers.d/99-$USERNAME
 EOF
 
-# ========== FINALIZE ==========
-if mountpoint -q /mnt; then
-  umount -R /mnt
-fi
-
-swapoff "/dev/$VG_NAME/swap"
 
 echo -e "\n[\u2713] Installation Complete"
 echo -e " Run 'passwd' and 'passwd $USERNAME' to set root and user passwords."
-echo -e " After your first boot, run /root/01-post_installation.sh to configure snapper."
+echo -e " Entering chroot for Password change, Run 'umount -R /mnt after Password Reset"
+arch-chroot /mnt /bin/bash
+
+# ========== FINALIZE ==========
+#if mountpoint -q /mnt; then
+#  umount -R /mnt
+#fi
+
+#swapoff "/dev/$VG_NAME/swap"
