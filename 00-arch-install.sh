@@ -73,12 +73,12 @@ umount /mnt
 
 # ========== MOUNTING ==========
 mount -o compress=zstd,subvol=@ /dev/$VG_NAME/root /mnt
-mkdir -p /mnt/{home,var,tmp,efi,.snapshots}
+mkdir -p /mnt/{home,var,tmp,boot,.snapshots}
 mount -o compress=zstd,subvol=@home /dev/$VG_NAME/root /mnt/home
 mount -o compress=zstd,subvol=@var /dev/$VG_NAME/root /mnt/var
 mount -o compress=zstd,subvol=@tmp /dev/$VG_NAME/root /mnt/tmp
 mount -o compress=zstd,subvol=@snapshots /dev/$VG_NAME/root /mnt/.snapshots
-mount "$EFI_PART" /mnt/efi
+mount "$EFI_PART" /mnt/boot
 swapon "/dev/$VG_NAME/swap"
 
 # ========== BASE INSTALL ==========
@@ -110,7 +110,7 @@ echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 echo "GRUB_DEFAULT=saved" >> /etc/default/grub
 echo "GRUB_SAVEDEFAULT=true" >> /etc/default/grub
 
-grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Localization and hostname
@@ -123,24 +123,17 @@ echo "$HOSTNAME" > /etc/hostname
 echo -e "127.0.0.1 localhost\n::1 localhost\n127.0.1.1 $HOSTNAME.localdomain $HOSTNAME" > /etc/hosts
 echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
 
-# NOTE: Snapper configuration is deferred.
-# Please run the post-install script (/root/post_install_snapper.sh) after your first boot.
-
 # Create user (without setting password)
 useradd -m -G wheel,audio,video,storage,network,power -s /bin/zsh "$USERNAME"
 echo "$USERNAME ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-$USERNAME
 chmod 440 /etc/sudoers.d/99-$USERNAME
 EOF
 
-
+# ========== FINAL STEPS ==========
 echo -e "\n[\u2713] Installation Complete"
-echo -e " Run 'passwd' and 'passwd $USERNAME' to set root and user passwords."
-echo -e " Entering chroot for Password change, Run 'umount -R /mnt after Password Reset"
-arch-chroot /mnt /bin/bash
-
-# ========== FINALIZE ==========
-#if mountpoint -q /mnt; then
-#  umount -R /mnt
-#fi
-
-#swapoff "/dev/$VG_NAME/swap"
+echo -e "========================================="
+echo -e " 1. Enter chroot by running arch-linux-recovery.sh"
+echo -e " 2. Run: passwd && passwd $USERNAME"
+echo -e " 3. Exit out from chroot and Unmount /mnt and then reboot!"
+echo -e " 4. After reboot run 'systemctl enable NetworkManager'"
+echo -e "========================================="
