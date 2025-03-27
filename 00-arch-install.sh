@@ -63,21 +63,23 @@ btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var
 btrfs subvolume create /mnt/@tmp
+btrfs subvolume create /mnt/@snapshots
 umount /mnt
 
 # ========== MOUNTING ==========
 mount -o compress=zstd,subvol=@ /dev/$VG_NAME/root /mnt
-mkdir -p /mnt/{home,var,tmp,efi}
+mkdir -p /mnt/{home,var,tmp,efi,.snapshots}
 mount -o compress=zstd,subvol=@home /dev/$VG_NAME/root /mnt/home
 mount -o compress=zstd,subvol=@var /dev/$VG_NAME/root /mnt/var
 mount -o compress=zstd,subvol=@tmp /dev/$VG_NAME/root /mnt/tmp
+mount -o compress=zstd,subvol=@snapshots /dev/$VG_NAME/root /mnt/.snapshots
 mount "$EFI_PART" /mnt/efi
 swapon "/dev/$VG_NAME/swap"
 
 # ========== BASE INSTALL ==========
 pacstrap /mnt base base-devel linux linux-headers linux-lts linux-lts-headers \
-  linux-firmware firmware-linux-nonfree lvm2 sudo vim btrfs-progs grub efibootmgr networkmanager \
-  dhcpcd wpa_supplicant iwd amd-ucode
+  linux-firmware lvm2 sudo vim btrfs-progs grub efibootmgr networkmanager \
+  dhcpcd wpa_supplicant iwd amd-ucode snapper snap-pac grub-btrfs
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -114,6 +116,26 @@ echo -e "127.0.0.1 localhost\n::1 localhost\n127.0.1.1 $HOSTNAME.localdomain $HO
 echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
 
 systemctl enable NetworkManager
+
+chmod 750 /.snapshots
+chown :wheel /.snapshots
+snapper -c root create-config /
+# Configure Snapper retention policy
+sed -i 's/^TIMELINE_CREATE=.*/TIMELINE_CREATE="yes"/' /etc/snapper/configs/root
+sed -i 's/^TIMELINE_CLEANUP=.*/TIMELINE_CLEANUP="yes"/' /etc/snapper/configs/root
+sed -i 's/^NUMBER_CLEANUP=.*/NUMBER_CLEANUP="yes"/' /etc/snapper/configs/root
+sed -i 's/^NUMBER_MIN_AGE=.*/NUMBER_MIN_AGE="1800"/' /etc/snapper/configs/root
+sed -i 's/^NUMBER_LIMIT=.*/NUMBER_LIMIT="50"/' /etc/snapper/configs/root
+sed -i 's/^NUMBER_LIMIT_IMPORTANT=.*/NUMBER_LIMIT_IMPORTANT="10"/' /etc/snapper/configs/root
+sed -i 's/^TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="10"/' /etc/snapper/configs/root
+sed -i 's/^TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="10"/' /etc/snapper/configs/root
+sed -i 's/^TIMELINE_LIMIT_WEEKLY=.*/TIMELINE_LIMIT_WEEKLY="0"/' /etc/snapper/configs/root
+sed -i 's/^TIMELINE_LIMIT_MONTHLY=.*/TIMELINE_LIMIT_MONTHLY="0"/' /etc/snapper/configs/root
+sed -i 's/^TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
+
+systemctl enable --now snapper-timeline.timer
+systemctl enable --now snapper-cleanup.timer
+systemctl enable --now grub-btrfs.path
 EOF
 
 # ========== SET ROOT PASSWORD MANUALLY ==========
@@ -124,6 +146,6 @@ arch-chroot /mnt /bin/bash -c "passwd"
 umount -R /mnt
 swapoff "/dev/$VG_NAME/swap"
 
-echo -e "\n[✓] Installation Complete"
+echo -e "\n[\u2713] Installation Complete"
 echo "Run /root/01-user-creation.sh after reboot."
 echo "To reboot now: sudo reboot"
