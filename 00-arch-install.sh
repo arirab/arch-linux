@@ -10,16 +10,6 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 echo -e "\n Welcome to Arch Installer"
 
 read -rp " Enter desired username: " USERNAME
-read -rsp " Enter password for $USERNAME: " USER_PASS
-echo
-read -rsp " Confirm password: " USER_PASS_CONFIRM
-echo
-
-if [[ "$USER_PASS" != "$USER_PASS_CONFIRM" ]]; then
-  echo " Passwords do not match. Aborting."
-  exit 1
-fi
-
 read -rp " Enter hostname [v01dsh3ll]: " HOSTNAME
 HOSTNAME=${HOSTNAME:-v01dsh3ll}
 
@@ -45,7 +35,6 @@ read -rp " Enter EFI partition size [1024MiB]: " EFI_SIZE
 EFI_SIZE=${EFI_SIZE:-1024MiB}
 
 LUKS_TYPE="luks2"
-
 
 # ========== PARTITION ==========
 echo -e "\n[+] Partitioning $DISK..."
@@ -78,11 +67,9 @@ mkfs.btrfs -f "/dev/$VG_NAME/root"
 
 # ========== BTRFS SUBVOLUMES ==========
 mount "/dev/$VG_NAME/root" /mnt
-btrfs subvolume create /mnt/@
-btrfs subvolume create /mnt/@home
-btrfs subvolume create /mnt/@var
-btrfs subvolume create /mnt/@tmp
-btrfs subvolume create /mnt/@snapshots
+for subvol in @ @home @var @tmp @snapshots; do
+  btrfs subvolume create "/mnt/$subvol"
+done
 umount /mnt
 
 # ========== MOUNTING ==========
@@ -137,12 +124,11 @@ echo "$HOSTNAME" > /etc/hostname
 echo -e "127.0.0.1 localhost\n::1 localhost\n127.0.1.1 $HOSTNAME.localdomain $HOSTNAME" > /etc/hosts
 echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
 
-systemctl enable NetworkManager
-
-# Snapper config
+# Snapper setup
 chmod 750 /.snapshots
 chown :wheel /.snapshots
 snapper -c root create-config /
+
 if [[ -f /etc/snapper/configs/root ]]; then
   sed -i 's/^TIMELINE_CREATE=.*/TIMELINE_CREATE="yes"/' /etc/snapper/configs/root
   sed -i 's/^TIMELINE_CLEANUP=.*/TIMELINE_CLEANUP="yes"/' /etc/snapper/configs/root
@@ -164,21 +150,11 @@ if systemctl list-unit-files | grep -q 'grub-btrfs.path'; then
   systemctl enable grub-btrfs.path
 fi
 
-# ========== Create User ==========
-echo -e "\n[+] Creating user $USERNAME..."
+# Create user (without setting password)
 useradd -m -G wheel,audio,video,storage,network,power -s /bin/zsh "$USERNAME"
-echo "$USERNAME:$USER_PASS" | chpasswd
 echo "$USERNAME ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-$USERNAME
 chmod 440 /etc/sudoers.d/99-$USERNAME
-
-if ! grep -q '^%wheel ALL=(ALL:ALL) NOPASSWD: ALL' /etc/sudoers; then
-  echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
-fi
 EOF
-
-# ========== SET ROOT PASSWORD ==========
-echo -e "\n[!] Set root password..."
-arch-chroot /mnt /bin/bash -c "passwd"
 
 # ========== FINALIZE ==========
 if mountpoint -q /mnt; then
@@ -188,4 +164,4 @@ fi
 swapoff "/dev/$VG_NAME/swap"
 
 echo -e "\n[\u2713] Installation Complete"
-echo "Reboot with: sudo reboot"
+echo -e " Run 'passwd' and 'passwd $USERNAME' after reboot to set root and user passwords."
