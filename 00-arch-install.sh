@@ -143,12 +143,9 @@ if [[ -f /etc/snapper/configs/root ]]; then
   sed -i 's/^TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
 fi
 
-systemctl enable snapper-timeline.timer
-systemctl enable snapper-cleanup.timer
-
-if systemctl list-unit-files | grep -q 'grub-btrfs.path'; then
-  systemctl enable grub-btrfs.path
-fi
+systemctl enable snapper-timeline.timer || true
+systemctl enable snapper-cleanup.timer || true
+systemctl enable NetworkManager || true
 
 # Create user (without setting password)
 useradd -m -G wheel,audio,video,storage,network,power -s /bin/zsh "$USERNAME"
@@ -164,4 +161,4 @@ fi
 swapoff "/dev/$VG_NAME/swap"
 
 echo -e "\n[\u2713] Installation Complete"
-echo -e " Run 'passwd' and 'passwd $USERNAME' after reboot to set root and user passwords."
+echo -e " Run 'passwd' and 'passwd $USERNAME' to set root and user passwords."
