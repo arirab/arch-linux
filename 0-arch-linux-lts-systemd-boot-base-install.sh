@@ -80,7 +80,7 @@ swapon "/dev/$VG_NAME/swap"
 
 # --- BASE INSTALL ---
 pacstrap /mnt base base-devel linux-lts linux-lts-headers \
-  linux-firmware lvm2 sudo vim btrfs-progs systemd-boot networkmanager \
+  linux-firmware lvm2 sudo vim btrfs-progs networkmanager \
   dhcpcd wpa_supplicant iwd amd-ucode snapper snap-pac zsh
 
 genfstab -U /mnt >> /mnt/etc/fstab
