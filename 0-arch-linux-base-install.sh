@@ -128,7 +128,9 @@ sed -i 's/^HOOKS=.*/HOOKS=(base systemd autodetect keyboard modconf block encryp
 echo "FILES=($KEYFILE)" >> /etc/mkinitcpio.conf
 mkinitcpio -P
 
-sed -i "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=$(blkid -s UUID -o value $LUKS_PART):$CRYPT_NAME root=/dev/$VG_NAME/root cryptkey=rootfs:$KEYFILE\"|" /etc/default/grub
+#sed -i "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=$(blkid -s UUID -o value $LUKS_PART):$CRYPT_NAME root=/dev/$VG_NAME/root cryptkey=rootfs:$KEYFILE\"|" /etc/default/grub
+sed -i "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=$(blkid -s UUID -o value $LUKS_PART):$CRYPT_NAME root=/dev/$VG_NAME/root\"|" /etc/default/grub
+
 
 echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 echo "GRUB_DEFAULT=saved" >> /etc/default/grub
