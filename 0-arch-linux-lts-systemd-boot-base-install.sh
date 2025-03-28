@@ -8,21 +8,21 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 # --- USER PROMPTS ---
 echo -e "\n Welcome to Arch Linux Installer (systemd-boot version)"
 
-read -rp " Enter Username [rock]: " USERNAME
+read -rp " Enter Username [Default: rock]: " USERNAME
 USERNAME=${USERNAME:-rock}
-read -rp " Enter Hostname [v01dsh3ll]: " HOSTNAME
+read -rp " Enter Hostname [Default: v01dsh3ll]: " HOSTNAME
 HOSTNAME=${HOSTNAME:-v01dsh3ll}
-read -rp " Enter Target Disk [/dev/nvme0n1]: " DISK
+read -rp " Enter Target Disk [Default: /dev/nvme0n1]: " DISK
 DISK=${DISK:-/dev/nvme0n1}
-read -rp " Enter Timezone [America/Denver]: " TIMEZONE
+read -rp " Enter Timezone [Default: America/Denver]: " TIMEZONE
 TIMEZONE=${TIMEZONE:-America/Denver}
-read -rp " Enter Keyboard Layout [us]: " KEYMAP
+read -rp " Enter Keyboard Layout [Default: us]: " KEYMAP
 KEYMAP=${KEYMAP:-us}
-read -rp " Enter LUKS Container Name [cryptarch]: " CRYPT_NAME
+read -rp " Enter LUKS Container Name [Default: cryptarch]: " CRYPT_NAME
 CRYPT_NAME=${CRYPT_NAME:-cryptarch}
-read -rp " Enter LVM Volume Group Name [vg0]: " VG_NAME
+read -rp " Enter LVM Volume Group Name [Default: vg0]: " VG_NAME
 VG_NAME=${VG_NAME:-vg0}
-read -rp " Enter EFI Partition Size [1024MiB]: " EFI_SIZE
+read -rp " Enter EFI Partition Size [Default: 1024MiB]: " EFI_SIZE
 EFI_SIZE=${EFI_SIZE:-1024MiB}
 
 LUKS_TYPE="luks2"
@@ -44,7 +44,7 @@ mkfs.fat -F32 "$EFI_PART"
 
 # --- ENCRYPTION ---
 echo -e "\n[+] Encrypting root partition..."
-read -srp " Enter LUKS Passphrase [default: Encryption-Password]: " luks_passphrase
+read -srp " Enter LUKS Passphrase [Default: Encryption-Password]: " luks_passphrase
 luks_passphrase=${luks_passphrase:-Encryption-Password}
 echo
 echo -n "$luks_passphrase" | cryptsetup luksFormat --type "$LUKS_TYPE" --pbkdf pbkdf2 --key-file=- "$LUKS_PART"
@@ -108,17 +108,17 @@ sed -i 's/^HOOKS=.*/HOOKS=(base systemd autodetect keyboard sd-encrypt block lvm
 mkinitcpio -P
 
 # --- systemd-boot Setup ---
-bootctl --path=/efi install
+bootctl install
 UUID=$(blkid -s UUID -o value "$LUKS_PART")
 
-cat <<BOOT > /efi/loader/entries/arch.conf
+cat <<BOOT > /boot/loader/entries/arch.conf
 title   Arch Linux (LTS)
 linux   /vmlinuz-linux-lts
 initrd  /initramfs-linux-lts.img
 options rd.luks.name=$UUID=$CRYPT_NAME root=/dev/mapper/$VG_NAME-root rootflags=subvol=@ quiet rw
 BOOT
 
-cat <<CONF > /efi/loader/loader.conf
+cat <<CONF > /boot/loader/loader.conf
 default arch.conf
 timeout 3
 console-mode max
