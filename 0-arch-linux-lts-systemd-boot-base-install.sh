@@ -69,12 +69,12 @@ umount /mnt
 
 # --- MOUNTING ---
 mount -o compress=zstd,subvol=@ "/dev/$VG_NAME/root" /mnt
-mkdir -p /mnt/{home,var,tmp,boot,.snapshots,efi}
+mkdir -p /mnt/{home,var,tmp,boot,.snapshots}
 mount -o compress=zstd,subvol=@home "/dev/$VG_NAME/root" /mnt/home
 mount -o compress=zstd,subvol=@var "/dev/$VG_NAME/root" /mnt/var
 mount -o compress=zstd,subvol=@tmp "/dev/$VG_NAME/root" /mnt/tmp
 mount -o compress=zstd,subvol=@snapshots "/dev/$VG_NAME/root" /mnt/.snapshots
-mount "$EFI_PART" /mnt/efi
+mount "$EFI_PART" /mnt/boot
 
 swapon "/dev/$VG_NAME/swap"
 
